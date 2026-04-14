@@ -80,14 +80,13 @@ while cap.isOpened():
         print("Không thể đọc khung hình từ camera. Có thể camera đang bận hoặc tín hiệu yếu.")
         break
 
-    # Lật ảnh để điều khiển tự nhiên như soi gương
+    # lat anh
     img = cv2.flip(img, 1)
     h, w, c = img.shape
     
-    # Chuyển màu sang RGB
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img_rgb)
-    timestamp = int(time.time() * 1000)
+    timestamp = int(time.time() * 1000) #nhan dien tay
     results = detector.detect_for_video(mp_image, timestamp)
 
     status = "RELAXING"
@@ -162,7 +161,7 @@ while cap.isOpened():
                 left_click_active = False
                 right_click_active = False
                 scroll_mode = False
-                margin_w = int(w * margin_ratio)
+                margin_w = int(w * margin_ratio) #anh xa toa do
                 margin_h = int(h * margin_ratio)
                 target_x = min(max(index.x * w, margin_w), w - margin_w)
                 target_y = min(max(index.y * h, margin_h), h - margin_h)
