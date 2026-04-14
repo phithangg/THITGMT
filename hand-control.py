@@ -34,7 +34,7 @@ def open_camera():
     return None
 
 
-# 1. Khởi tạo MediaPipe Hand Landmarker
+# tao hand landmarker
 base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
 options = vision.HandLandmarkerOptions(
     base_options=base_options,
@@ -47,7 +47,7 @@ options = vision.HandLandmarkerOptions(
 
 detector = vision.HandLandmarker.create_from_options(options)
 
-# 2. Khởi tạo Camera
+# dieu khien
 cap = open_camera()
 pTime = 0
 
@@ -56,9 +56,13 @@ right_click_active = False
 scroll_mode = False
 scroll_prev_y = 0
 last_action_time = 0
-action_cooldown = 0.8  # giây
+action_cooldown = 0.8  
 click_threshold = 45
 scroll_threshold = 50
+prev_mouse_x = None
+prev_mouse_y = None
+smoothing = 0.25
+margin_ratio = 0.15
 
 print("Hệ thống đang khởi động... Nhấn 'q' để thoát.")
 
