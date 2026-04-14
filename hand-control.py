@@ -59,10 +59,6 @@ last_action_time = 0
 action_cooldown = 0.8  # giây
 click_threshold = 45
 scroll_threshold = 50
-prev_mouse_x = None
-prev_mouse_y = None
-smoothing = 0.25
-margin_ratio = 0.15
 
 print("Hệ thống đang khởi động... Nhấn 'q' để thoát.")
 
