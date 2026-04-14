@@ -59,6 +59,10 @@ last_action_time = 0
 action_cooldown = 0.8  # giây
 click_threshold = 45
 scroll_threshold = 50
+prev_mouse_x = None
+prev_mouse_y = None
+smoothing = 0.25
+margin_ratio = 0.15
 
 print("Hệ thống đang khởi động... Nhấn 'q' để thoát.")
 
@@ -158,9 +162,25 @@ while cap.isOpened():
                 left_click_active = False
                 right_click_active = False
                 scroll_mode = False
-                screen_x = int(index.x * screen_w)
-                screen_y = int(index.y * screen_h)
-                pyautogui.moveTo(screen_x, screen_y, duration=0.01)
+                margin_w = int(w * margin_ratio)
+                margin_h = int(h * margin_ratio)
+                target_x = min(max(index.x * w, margin_w), w - margin_w)
+                target_y = min(max(index.y * h, margin_h), h - margin_h)
+                norm_x = (target_x - margin_w) / (w - 2 * margin_w)
+                norm_y = (target_y - margin_h) / (h - 2 * margin_h)
+                screen_x = int(norm_x * screen_w)
+                screen_y = int(norm_y * screen_h)
+
+                if prev_mouse_x is None:
+                    prev_mouse_x = screen_x
+                    prev_mouse_y = screen_y
+
+                smooth_x = int(prev_mouse_x + (screen_x - prev_mouse_x) * smoothing)
+                smooth_y = int(prev_mouse_y + (screen_y - prev_mouse_y) * smoothing)
+                prev_mouse_x = smooth_x
+                prev_mouse_y = smooth_y
+
+                pyautogui.moveTo(smooth_x, smooth_y, duration=0.01)
                 status = "MOVE CURSOR"
                 color = (0, 255, 0)
                 gesture_text = "MOVING CURSOR"
