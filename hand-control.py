@@ -58,6 +58,7 @@ scroll_prev_y = 0
 last_action_time = 0
 action_cooldown = 0.8  
 click_threshold = 45
+volume_threshold = 35
 scroll_threshold = 50
 prev_mouse_x = None
 prev_mouse_y = None
@@ -102,10 +103,14 @@ while cap.isOpened():
             thumb = handLms[4]
             index = handLms[8]
             middle = handLms[12]
+            ring = handLms[16]
+            pinky = handLms[20]
 
             tx, ty = int(thumb.x * w), int(thumb.y * h)
             ix, iy = int(index.x * w), int(index.y * h)
             mx, my = int(middle.x * w), int(middle.y * h)
+            rx, ry = int(ring.x * w), int(ring.y * h)
+            px, py = int(pinky.x * w), int(pinky.y * h)
 
             # Vẽ hiệu ứng các đầu ngón
             cv2.circle(img, (tx, ty), 10, (255, 0, 255), cv2.FILLED)
@@ -117,6 +122,8 @@ while cap.isOpened():
 
             left_distance = math.hypot(ix - tx, iy - ty)
             right_distance = math.hypot(mx - tx, my - ty)
+            ring_distance = math.hypot(rx - tx, ry - ty)
+            pinky_distance = math.hypot(px - tx, py - ty)
             scroll_distance = math.hypot(mx - ix, my - iy)
 
             if left_distance < click_threshold:
@@ -139,6 +146,26 @@ while cap.isOpened():
                     gesture_text = "RIGHT CLICK"
                 status = "RIGHT CLICK READY"
                 color = (0, 0, 255)
+            elif ring_distance < volume_threshold:
+                scroll_mode = False
+                left_click_active = False
+                right_click_active = False
+                if time.time() - last_action_time > action_cooldown:
+                    last_action_time = time.time()
+                    pyautogui.press('volumeup')
+                    gesture_text = "VOLUME UP"
+                status = "VOLUME UP"
+                color = (0, 128, 255)
+            elif pinky_distance < volume_threshold:
+                scroll_mode = False
+                left_click_active = False
+                right_click_active = False
+                if time.time() - last_action_time > action_cooldown:
+                    last_action_time = time.time()
+                    pyautogui.press('volumedown')
+                    gesture_text = "VOLUME DOWN"
+                status = "VOLUME DOWN"
+                color = (0, 128, 255)
             elif scroll_distance < scroll_threshold:
                 left_click_active = False
                 right_click_active = False
@@ -195,6 +222,8 @@ while cap.isOpened():
     cv2.putText(img, f"SYSTEM STATUS: {status}", (20, h-50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
     cv2.putText(img, gesture_text, (20, h-25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
+    cv2.namedWindow("IoT Hand Gesture Control", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("IoT Hand Gesture Control", cv2.WND_PROP_TOPMOST, 1)
     cv2.imshow("IoT Hand Gesture Control", img)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
